@@ -35,17 +35,17 @@ router.route('/registerUser').post(function(req, res) {
             });
        }else{
            //console.log(hash);
-           user.findOne({email:email}).then(resp => {
-               //console.log(resp)
-               if(resp){
-                   return res.json({data:[resp], success:false, message:"Email is already Exist"
-                   })
-               }else{
+      user.findOne({email:email}).then(resp => {
+          //console.log(resp)
+          if(resp){
+              return res.json({data:[resp], success:false, message:"Email is already Exist"
+              })
+          }else{
 
     obj = {name:name, email:email, password:hash};
     //console.log(obj)
     user.create(obj, function(err, regiuser){
-    //console.log(regist)
+    //console.log(regiuser)
     if(err){
           return res.json({data:[regiuser], success:false, message:"Email Exist", error:err})
     }else{
@@ -53,11 +53,11 @@ router.route('/registerUser').post(function(req, res) {
       }
     })
   }
-})
-       }
-      })
-    }
-  });
+    })
+  }
+    })
+   }
+});
 
   router.route('/UserList').get(function(req, res) {
     //console.log("asdas")
@@ -85,6 +85,30 @@ router.route('/registerUser').post(function(req, res) {
       }
     })
   });
+
+  // router.route('/UserDelete').get(function(req, res) {
+  //     var id = req.body.id
+  //   user.deleteOne({_id:id}).exec(function(err, deldata){
+  //     if(err){
+  //        return res.json({error:err})
+  //     }else{
+  router.route('/UserUpdate').put(function(req, res) {
+    //console.log("asdas")
+    //var hashedPassword = bcrypt.hashSync(req.body.password, 8);
+    var id = req.body.id 
+    //var password = hashedPassword
+    user.update({_id:id, password:password},req.body).exec(function(err, userupd){
+    console.log(userupd)
+      if(err){
+          return res.json({error:err, message:"User update problem"})
+      }else{
+          return res.json({userupd})
+      }
+    })
+  })
+//       }
+// })
+//   });
   
   router.route('/login').post(function(req, res) {
     //console.log(req.body)
@@ -95,14 +119,14 @@ router.route('/registerUser').post(function(req, res) {
   if (!user) return res.json('No user.');
 
        var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-       if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
+       if (!passwordIsValid) return res.status(401).send({message:"Email and password is wrong", auth: false, token: null });
 
        var token = jwt.sign({ id: user._id }, config.secret, {
        expiresIn: 86400
    });
       user.access_token = token
       // console.log(user)
-      res.status(200).json({ sucess: true, user:user,access_token:token});
+      res.status(200).json({message:"User Login", sucess: true, user:user,access_token:token});
    });
 });
 
